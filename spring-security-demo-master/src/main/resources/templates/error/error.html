@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head th:replace="~{fragments/layout :: head('Erreur')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-8 text-center">
+            <div class="error-template">
+                <div class="mb-4">
+                    <i class="bi bi-exclamation-circle text-secondary" style="font-size: 8rem;"></i>
+                </div>
+                <h1 class="display-1 fw-bold text-secondary" th:text="${statusCode} ?: 'Erreur'">Error</h1>
+                <h2 class="mb-4" th:text="${errorTitle} ?: 'Une erreur est survenue'">Erreur</h2>
+                <div class="alert alert-secondary" role="alert">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    <strong th:text="${errorMessage} ?: 'Une erreur inattendue s\'est produite.'">Message d'erreur</strong>
+                </div>
+                <p class="text-muted mb-4">
+                    Nous nous excusons pour ce désagrément. Veuillez réessayer ou retourner à l'accueil.
+                </p>
+                
+                <div class="d-flex justify-content-center gap-3 mt-4">
+                    <a href="/" class="btn btn-primary">
+                        <i class="bi bi-house-door me-2"></i>Retour à l'accueil
+                    </a>
+                    <button onclick="history.back()" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-2"></i>Page précédente
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+</body>
+</html>

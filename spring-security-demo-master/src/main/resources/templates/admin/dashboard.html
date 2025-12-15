@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Admin Dashboard')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2>Admin Dashboard</h2>
+            <p class="text-muted">System overview and statistics</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-people-fill"></i> Total Users</h5>
+                    <h2 class="card-text" th:text="${userCount}">0</h2>
+                    <a href="/admin/users" class="btn btn-light btn-sm">Manage Users</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-list-check"></i> Total Tasks</h5>
+                    <h2 class="card-text" th:text="${taskCount}">0</h2>
+                    <a href="/tasks" class="btn btn-light btn-sm">View Tasks</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+</body>
+</html>

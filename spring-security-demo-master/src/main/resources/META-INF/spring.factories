@@ -1,0 +1,1 @@
+context.initializer.classes=com.misi2.springsecuritydemo.config.DotenvConfig

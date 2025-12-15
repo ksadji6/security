@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head th:replace="~{fragments/layout :: head('Erreur Serveur - 500')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-8 text-center">
+            <div class="error-template">
+                <div class="mb-4">
+                    <i class="bi bi-exclamation-triangle text-danger" style="font-size: 8rem;"></i>
+                </div>
+                <h1 class="display-1 fw-bold text-danger">500</h1>
+                <h2 class="mb-4">Erreur Serveur</h2>
+                <div class="alert alert-danger" role="alert">
+                    <i class="bi bi-x-circle-fill me-2"></i>
+                    <strong>Une erreur interne s'est produite sur le serveur.</strong>
+                </div>
+                <p class="text-muted mb-4">
+                    Nous sommes désolés pour ce désagrément. Notre équipe a été notifiée et travaille 
+                    à résoudre le problème. Veuillez réessayer dans quelques instants.
+                </p>
+                
+                <div class="d-flex justify-content-center gap-3 mt-4">
+                    <a href="/" class="btn btn-primary">
+                        <i class="bi bi-house-door me-2"></i>Retour à l'accueil
+                    </a>
+                    <button onclick="location.reload()" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Réessayer
+                    </button>
+                    <button onclick="history.back()" class="btn btn-outline-info">
+                        <i class="bi bi-arrow-left me-2"></i>Page précédente
+                    </button>
+                </div>
+                
+                <div class="mt-5 p-4 bg-light rounded">
+                    <h5 class="mb-3"><i class="bi bi-tools me-2"></i>Que faire ?</h5>
+                    <div class="row text-start">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <h6 class="text-primary">
+                                    <i class="bi bi-arrow-clockwise"></i> Réessayez
+                                </h6>
+                                <p class="small text-muted">
+                                    Actualisez la page ou réessayez votre action dans quelques instants.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <h6 class="text-success">
+                                    <i class="bi bi-arrow-left"></i> Revenez en arrière
+                                </h6>
+                                <p class="small text-muted">
+                                    Retournez à la page précédente et essayez une autre action.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <h6 class="text-info">
+                                    <i class="bi bi-envelope"></i> Contactez-nous
+                                </h6>
+                                <p class="small text-muted">
+                                    Si le problème persiste, contactez l'administrateur système.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <p class="small text-muted">
+                        <i class="bi bi-clock-history"></i> 
+                        Erreur survenue le <span th:text="${#dates.format(#dates.createNow(), 'dd/MM/yyyy HH:mm:ss')}"></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+</body>
+</html>

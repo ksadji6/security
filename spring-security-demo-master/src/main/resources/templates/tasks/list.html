@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="fr">
+<head th:replace="~{fragments/layout :: head('Task Management')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>Task Management</h2>
+            <p class="text-muted" sec:authorize="hasRole('ADMIN')">Admin View: You can see and manage all tasks.</p>
+            <p class="text-muted" sec:authorize="hasRole('GERANT')">Manager View: You can create and assign tasks.</p>
+            <p class="text-muted" sec:authorize="hasRole('USER')">User View: You can only see your assigned tasks.</p>
+        </div>
+        <div class="col-md-4 text-end" sec:authorize="hasAnyRole('ADMIN', 'GERANT')">
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createTaskModal">
+                <i class="bi bi-plus-circle"></i> Create New Task
+            </button>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" action="/tasks" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="statusFilter" class="form-label">Filter by Status</label>
+                            <select class="form-select" id="statusFilter" name="status" onchange="this.form.submit()">
+                                <option value="" th:selected="${selectedStatus == null}">All Statuses</option>
+                                <option value="TODO" th:selected="${selectedStatus == 'TODO'}">TODO</option>
+                                <option value="IN_PROGRESS" th:selected="${selectedStatus == 'IN_PROGRESS'}">IN PROGRESS</option>
+                                <option value="COMPLETED" th:selected="${selectedStatus == 'COMPLETED'}">COMPLETED</option>
+                                <option value="CANCELED" th:selected="${selectedStatus == 'CANCELED'}">CANCELED</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3" sec:authorize="hasAnyRole('ADMIN', 'GERANT')">
+                            <label for="assigneeFilter" class="form-label">Filter by Assignee</label>
+                            <select class="form-select" id="assigneeFilter" name="assignee" onchange="this.form.submit()">
+                                <option value="" th:selected="${selectedAssignee == null}">All Users</option>
+                                <option th:each="u : ${users}" 
+                                        th:value="${u.id}" 
+                                        th:text="${u.username}"
+                                        th:selected="${selectedAssignee != null and selectedAssignee == u.id}">User</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-funnel"></i> Apply Filters
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task List -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-list-check"></i> Tasks
+                </div>
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th>Assigned To</th>
+                                <th>Status</th>
+                                <th sec:authorize="hasAnyRole('ADMIN', 'GERANT')">Reassign</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="task : ${tasks}">
+                                <td th:text="${task.id}">1</td>
+                                <td th:text="${task.title}">Task Title</td>
+                                <td th:text="${task.description}">Desc</td>
+                                <td>
+                                    <span th:if="${task.assignedTo}" th:text="${task.assignedTo.username}" class="badge bg-info text-dark">User</span>
+                                    <span th:unless="${task.assignedTo}" class="badge bg-secondary">Unassigned</span>
+                                </td>
+                                <td>
+                                    <span th:text="${task.status}" 
+                                          th:class="${'badge ' + (task.status.name() == 'COMPLETED' ? 'bg-success' : (task.status.name() == 'IN_PROGRESS' ? 'bg-warning text-dark' : (task.status.name() == 'CANCELED' ? 'bg-danger' : 'bg-secondary')))}">
+                                        TODO
+                                    </span>
+                                </td>
+                                <td sec:authorize="hasAnyRole('ADMIN', 'GERANT')">
+                                    <form th:action="@{/tasks/{id}/reassign(id=${task.id})}" method="post" style="display:inline;">
+                                        <label>
+                                            <select class="form-select form-select-sm" name="assignedToId" onchange="this.form.submit()" style="width: auto;">
+                                                <option value="" disabled selected>-- Reassign --</option>
+                                                <option th:each="u : ${users}"
+                                                        th:value="${u.id}"
+                                                        th:text="${u.username}"
+                                                        th:selected="${task.assignedTo != null and task.assignedTo.id == u.id}">User</option>
+                                            </select>
+                                        </label>
+                                    </form>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <!-- Status Updates -->
+                                        <form th:action="@{/tasks/{id}/status(id=${task.id})}" method="post" style="display:inline;">
+                                            <input type="hidden" name="status" value="IN_PROGRESS">
+                                            <button type="submit" class="btn btn-outline-primary btn-sm" th:if="${task.status.name() == 'TODO'}">Start</button>
+                                        </form>
+                                        <form th:action="@{/tasks/{id}/status(id=${task.id})}" method="post" style="display:inline;">
+                                            <input type="hidden" name="status" value="COMPLETED">
+                                            <button type="submit" class="btn btn-outline-success btn-sm" th:if="${task.status.name() != 'COMPLETED'}">Complete</button>
+                                        </form>
+                                        
+                                        <!-- Delete (Admin only) -->
+                                        <form sec:authorize="hasRole('ADMIN')" th:action="@{/tasks/{id}/delete(id=${task.id})}" method="post" style="display:inline; margin-left: 5px;">
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete task?')">Delete</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(tasks)}">
+                                <td colspan="7" class="text-center text-muted">No tasks found.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Task Modal -->
+<div class="modal fade" id="createTaskModal" tabindex="-1" aria-labelledby="createTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createTaskModalLabel"><i class="bi bi-plus-circle"></i> Create New Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form th:action="@{/tasks}" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="assignedToId" class="form-label">Assign To</label>
+                        <select class="form-select" id="assignedToId" name="assignedToId">
+                            <option value="">-- Unassigned --</option>
+                            <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.username} + ' (' + ${user.role} + ')'">User</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Create Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+</body>
+</html>
