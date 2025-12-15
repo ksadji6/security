@@ -28,7 +28,7 @@ jobs:
         distribution: 'temurin'
 
     - name: Build with Maven
-      working-directory: spring-security-demo-master/pom.xml
+      working-directory: spring-security-demo-master
       run: mvn -B clean compile
 
     - name: Run tests (optional)
