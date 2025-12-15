@@ -21,6 +21,19 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Afficher la structure
+      run: |
+        echo "📂 Arborescence complète :"
+        find . -type f -name "pom.xml" 2>/dev/null | head -20
+        echo "---"
+        ls -la
+        echo "---"
+        if [ -d "./spring-security-demo-master" ]; then
+          echo "Le dossier spring-security-demo-master existe :"
+          ls -la "./spring-security-demo-master/"
+        else
+          echo "❌ Dossier spring-security-demo-master introuvable."
+        fi
     - name: Set up JDK 21
       uses: actions/setup-java@v4
       with:
